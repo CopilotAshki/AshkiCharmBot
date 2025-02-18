@@ -320,12 +320,14 @@ async def save_sale(message: types.Message, state: FSMContext):
         # ✅ Сохраняем изменения в БД **одним коммитом**
         session.commit()
 
+        sale_lines = '\n'.join(sale_texts)
+
         # ✅ Формируем итоговое сообщение
         response_text = (
             f"✅ <b>Продажа завершена!</b>\n"
             f"📅 <b>Дата:</b> {datetime.datetime.now().strftime('%d.%m.%Y %H:%M')}\n"
             f"👤 <b>Покупатель:</b> {customer_name}\n\n"
-            f"{'\n'.join(sale_texts)}\n"
+            f"{sale_lines}\n"
             f"💰 <b>Общая выручка:</b> {total_revenue:.2f} ₽\n"
             f"📊 <b>Прибыль:</b> {total_profit:.2f} ₽"
         )
