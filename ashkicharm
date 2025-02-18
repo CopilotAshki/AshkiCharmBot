@@ -131,22 +131,40 @@ def parse_flavor_line(line: str):
     except Exception:
         raise ValueError(f"Ошибка в строке: {line}")
 
+
+
 # ======================= ОБРАБОТЧИКИ ======================= #
+def is_navigation_command(text: str) -> bool:
+    """Функция определяет, является ли сообщение командой перехода в другой раздел"""
+    return text in ["📦 Управление товарами", "💵 Записать продажу", "📦 Показать товары", "📊 Аналитика", "🔙 Назад"]
+
+async def check_navigation(message: types.Message, state: FSMContext):
+    """Если пользователь выбрал другой раздел, сбрасываем состояние и возвращаем True"""
+    if is_navigation_command(message.text):
+        await state.clear()  # Очищаем текущее состояние FSM
+        await cmd_start(message)  # Возвращаем пользователя в главное меню
+        return True
+    return False
+
 @dp.message(AddProductState.enter_name)
 async def enter_product_name(message: types.Message, state: FSMContext):
-    if message.text.lower() in ["отмена", "/cancel"]:
-        await state.clear()
-        await cmd_start(message)
+    if await check_navigation(message, state):
         return
 
     name = message.text.strip()
+
+    if not name:
+        await message.answer("❌ Имя товара не может быть пустым! Введите название товара снова:")
+        return
+
     with Session() as session:
-        if session.query(Product).filter_by(name=name).first():
-            await message.answer("❌ Товар с таким именем уже существует!")
-            return
+        existing_product = session.query(Product).filter_by(name=name).first()
+        if existing_product:
+            await message.answer("❌ Товар с таким именем уже существует! Введите другое название:")
+            return  # Не меняем состояние, даем повторно ввести
+
     await state.update_data(name=name)
-    await message.answer("Введите цены через пробел (Закупочная Продажная):",
-                        reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("Введите цены через пробел:\nФормат: <b>Закупочная Продажная</b>\nПример: 100 200")
     await state.set_state(AddProductState.enter_prices)
 
 @dp.message(AddProductState.enter_prices)
@@ -164,7 +182,7 @@ async def enter_product_prices(message: types.Message, state: FSMContext):
         await state.set_state(AddProductState.enter_flavors)
     except:
         await message.answer("❌ Неверный формат цен! Используйте: Закупочная Продажная")
-        return
+        await state.set_state(AddProductState.enter_prices)
 
 @dp.message(Command("start", "help"))
 async def cmd_start(message: types.Message):
@@ -313,18 +331,22 @@ async def enter_product_prices(message: types.Message, state: FSMContext):
         await state.set_state(AddProductState.enter_flavors)
     except:
         await message.answer("❌ Неверный формат цен! Повторите ввод в формате:\n<b>Закупочная Продажная</b>\nПример: 100 200")
-        return
+        await state.set_state(AddProductState.enter_prices)
+
 
 @dp.message(AddProductState.enter_flavors)
 async def enter_product_flavors(message: types.Message, state: FSMContext):
-    if message.text in ["📦 Управление товарами", "💵 Записать продажу", "📦 Показать товары", "📊 Аналитика", "🔙 Назад"]:
-        await state.clear()
-        await cmd_start(message)
+    if await check_navigation(message, state):
         return
 
-    try:
-        data = await state.get_data()
-        with Session() as session:
+    data = await state.get_data()
+
+    with Session() as session:
+        # Проверяем, есть ли уже созданный товар
+        product = session.query(Product).filter_by(name=data['name']).first()
+
+        # Если товара нет (значит он был удален ранее), создаем его заново
+        if not product:
             product = Product(
                 name=data['name'],
                 purchase_price=data['purchase_price'],
@@ -333,36 +355,35 @@ async def enter_product_flavors(message: types.Message, state: FSMContext):
             session.add(product)
             session.commit()
 
-            flavors = []
-            errors = []
-            for line in message.text.split('\n'):
-                line = line.strip()
-                if not line: continue
-                try:
-                    name, quantity = parse_flavor_line(line)
-                    flavors.append(Flavor(name=name, quantity=quantity, product=product))
-                except Exception as e:
-                    errors.append(f"❌ {line}")
+        flavors = []
+        errors = []
 
-            if errors:
-                await message.answer("⚠️ Ошибки в строках:\n" + "\n".join(errors[:5]) + ("\n..." if len(errors) > 5 else ""))
+        for line in message.text.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                name, quantity = parse_flavor_line(line)
+                flavors.append(Flavor(name=name, quantity=quantity, product=product))
+            except ValueError:
+                errors.append(f"❌ Ошибка в строке: {line}")
 
-            if flavors:
-                session.add_all(flavors)
-                session.commit()
-                await message.answer(f"✅ Товар <b>{product.name}</b> добавлен!\n🍏 Вкусов: {len(flavors)}")
-                await cmd_start(message)  # Возврат в меню
-            else:
-                session.delete(product)
-                session.commit()
-                await message.answer("❌ Не добавлено ни одного вкуса!")
-                await cmd_start(message)  # Возврат в меню
-    except Exception as e:
-        logger.error(f"Ошибка: {str(e)}")
-        await message.answer("❌ Ошибка при создании товара!")
-    finally:
-        await state.clear()
+        # Если есть ошибки, запрашиваем повторный ввод вкусов
+        if errors:
+            await message.answer("⚠️ Ошибки в строках:\n" + "\n".join(errors[:5]) +
+                                 "\n\n🔄 Введите вкусы и количества снова (каждый с новой строки):")
+            return  # НЕ сбрасываем состояние, ждем исправленный ввод
 
+        # Если вкусы корректны, добавляем их в базу
+        if flavors:
+            session.add_all(flavors)
+            session.commit()
+            await message.answer(f"✅ Товар <b>{product.name}</b> добавлен!\n🍏 Вкусов: {len(flavors)}")
+            await state.clear()  # Завершаем процесс
+            await cmd_start(message)
+        else:
+            await message.answer("❌ Не добавлено ни одного вкуса! Введите данные заново:")
+            return  # Ждем повторного ввода
 
 
 # Команда "✏️ Редактировать товар"
