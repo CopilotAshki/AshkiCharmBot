@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8b01f02b-b809-4e56-848e-30a6c901c4bc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/logs/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/AshkiCharm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/ashkicharm" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/logs/requirements.txt.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/logs/.env.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.txt" beforeDir="false" afterPath="$PROJECT_DIR$/.env.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AshkiCharm.py" beforeDir="false" afterPath="$PROJECT_DIR$/AshkiCharm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot.log" beforeDir="false" afterPath="$PROJECT_DIR$/bot.log" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +34,7 @@
     "Python.AshkiCharm.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/python/PyCharmTest",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

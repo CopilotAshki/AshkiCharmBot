@@ -11431,3 +11431,15 @@ WHERE sales.customer_id IS NULL]
 2025-02-18 21:40:00,444 - aiogram.event - INFO - Update id=23039018 is handled. Duration 375 ms by bot id=8009224301
 2025-02-18 21:48:45,703 - aiogram.dispatcher - INFO - Polling stopped
 2025-02-18 21:48:45,961 - aiogram.dispatcher - INFO - Polling stopped for bot @MoyAshki_bot id=8009224301 - 'Sklad_ashek'
+2025-02-18 21:59:43,839 - __main__ - INFO - Бот запущен
+2025-02-18 21:59:43,840 - aiogram.dispatcher - INFO - Start polling
+2025-02-18 21:59:44,241 - aiogram.dispatcher - INFO - Run polling for bot @MoyAshki_bot id=8009224301 - 'Sklad_ashek'
+2025-02-18 21:59:55,059 - aiogram.event - INFO - Update id=23039019 is handled. Duration 360 ms by bot id=8009224301
+2025-02-18 22:02:46,435 - aiogram.event - INFO - Update id=23039020 is handled. Duration 1437 ms by bot id=8009224301
+2025-02-18 22:02:49,110 - aiogram.event - INFO - Update id=23039021 is handled. Duration 218 ms by bot id=8009224301
+2025-02-18 22:02:53,319 - aiogram.event - INFO - Update id=23039022 is handled. Duration 125 ms by bot id=8009224301
+2025-02-18 22:02:55,209 - aiogram.event - INFO - Update id=23039023 is handled. Duration 375 ms by bot id=8009224301
+2025-02-18 22:02:57,871 - aiogram.event - INFO - Update id=23039024 is handled. Duration 187 ms by bot id=8009224301
+2025-02-18 22:15:53,812 - aiogram.event - INFO - Update id=23039025 is handled. Duration 140 ms by bot id=8009224301
+2025-02-18 22:48:14,557 - aiogram.dispatcher - INFO - Polling stopped
+2025-02-18 22:48:14,812 - aiogram.dispatcher - INFO - Polling stopped for bot @MoyAshki_bot id=8009224301 - 'Sklad_ashek'
